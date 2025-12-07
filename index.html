@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Transparency PoC</title>
+    <!-- TODO: [JHON] CSS time nimo idol -->
+</head>
+<body>
+
+    <h1>Job Application Portal</h1>
+    
+    <!-- TODO: [KRYSTAL] Mode Selection po nimo idol (Black Box vs Transparent)-->
+
+    <hr>
+
+    <!-- Application Form -->
+    <form id="application-form">
+        <div>
+            <label for="gpa">GPA (0.0 - 4.0):</label>
+            <input type="number" id="gpa" name="gpa" step="0.1" min="0" max="4" required>
+        </div>
+        <br>
+        <div>
+            <label for="experience">Years of Experience:</label>
+            <input type="number" id="experience" name="experience" min="0" required>
+        </div>
+        <br>
+        <button type="submit">Apply Now</button>
+    </form>
+
+    <hr>
+
+    <!-- Result Display -->
+    <div id="result-area" style="display:none;">
+        <h3 id="result-title"></h3>
+        <p id="result-message"></p>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            thresholds: {
+                gpa: 3.0,
+                experience: 3
+            }
+            // TODO: [KRYSTAL] Add delays configuration here
+        };
+
+        // DOM Elements
+        const form = document.getElementById('application-form');
+        const resultArea = document.getElementById('result-area');
+        const resultTitle = document.getElementById('result-title');
+        const resultMessage = document.getElementById('result-message');
+
+        function init() {
+            form.addEventListener('submit', handleSubmission);
+        }
+
+        function handleSubmission(event) {
+            event.preventDefault();
+            
+            // TODO: [JOSEPH] Add input validation here (ensure GPA is 0-4, etc.)
+
+            const gpa = parseFloat(document.getElementById('gpa').value);
+            const experience = parseInt(document.getElementById('experience').value);
+            
+            // Javier's Task: Hardcoded to Black Box Mode for now
+            processApplication(gpa, experience);
+        }
+
+        function processApplication(gpa, experience) {
+            // TODO: [KRYSTAL] Implement delay logic for Transparent Mode here
+
+            const result = evaluateCandidate(gpa, experience);
+            displayResult(result);
+        }
+
+        function evaluateCandidate(gpa, experience) {
+            // Basic Scoring Logic
+            const passedGpa = gpa >= CONFIG.thresholds.gpa;
+            const passedExp = experience >= CONFIG.thresholds.experience;
+            const accepted = passedGpa && passedExp;
+            
+            // Dummy score calculation
+            const score = (gpa / 4.0 * 0.5) + (Math.min(experience, 10) / 10 * 0.5);
+
+            // TODO: [JOSEPH] Create helper function to generate explanation text
+            // const reasons = generateExplanations(gpa, experience);
+
+            return { accepted, score: score.toFixed(2) };
+        }
+
+        function displayResult(result) {
+            resultArea.style.display = 'block';
+            
+            if (result.accepted) {
+                resultTitle.textContent = "ACCEPTED";
+                resultMessage.textContent = "Congratulations! You meet all our criteria.";
+            } else {
+                resultTitle.textContent = "REJECTED";
+                // Black Box Mode: Show generic message and score
+                resultMessage.textContent = `Score: ${result.score}. We have decided not to proceed with your application.`;
+                
+                // TODO: [KRYSTAL] Add logic to display specific reasons in Transparent Mode
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
