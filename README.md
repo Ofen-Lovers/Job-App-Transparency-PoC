@@ -11,8 +11,8 @@ This PoC demonstrates the trade-off between **Performance** (Black Box Mode) and
     *   *Current Status*: Implemented basic skeleton and Black Box scoring.
 *   **Krystal Bacalso**: Transparent Mode Logic.
     *   *Task*: Implement the mode toggle, simulated delays, and the logic to switch between Black Box and Transparent modes.
-*   **Jhon Lloyd Omblero**: Frontend Design & Layout.
-    *   *Task*: Apply CSS styling to make the interface look professional (replacing the current barebones HTML).
+*   **Jhon Lloyd Omblero: Frontend Design & Layout
+    *   *Task*: Enhance the UI by applying professional CSS styling to replace the current basic HTML appearance.
 *   **Joseph Deysolong**: Input Validation & Explanation Logic.
     *   *Task*: Implement input validation (e.g., GPA range checks) and helper functions to generate specific explanation text for rejections.
 
