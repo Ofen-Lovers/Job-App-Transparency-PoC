@@ -4,165 +4,399 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Application Transparency PoC</title>
-    <!-- TODO: [JHON] CSS time nimo idol -->
+    <!-- [JHON] Styling Implemented -->
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #334155;
+            --success: #10b981;
+            --error: #ef4444;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border);
+        }
+
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .mode-selector {
+            display: flex;
+            background-color: var(--bg-color);
+            padding: 0.25rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .mode-option {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
+
+        .mode-option.active {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.875rem;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        #result-area {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-direction: column; /* Key for list items in center */
+            font-size: 0.95rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #result-area.visible {
+            opacity: 1;
+        }
+
+        .status-rejected {
+            color: var(--error);
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-accepted {
+            color: var(--success);
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .explanation {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: normal;
+        }
+        
+        ul.explanation-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 0.5rem;
+            text-align: left;
+            width: 100%;
+        }
+        
+        ul.explanation-list li {
+            background: rgba(239, 68, 68, 0.1); /* Red tint for errors */
+            color: var(--text-primary);
+            padding: 0.5rem;
+            margin-bottom: 0.25rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            border-left: 3px solid var(--error);
+        }
+        
+        .placeholder {
+            color: var(--text-secondary);
+        }
+    </style>
 </head>
 <body>
 
-    <h1>Job Application Portal</h1>
-    
-    <!-- Mode Selection -->
-    <fieldset id="mode-selection">
-        <legend>Select System Mode:</legend>
-        <div>
-            <input type="radio" id="mode-blackbox" name="mode" value="blackbox" checked>
-            <label for="mode-blackbox">Black Box Mode (Fast, Opaque)</label>
-        </div>
-        <div>
-            <input type="radio" id="mode-transparent" name="mode" value="transparent">
-            <label for="mode-transparent">Transparent Mode (Slower, Explains Decisions)</label>
-        </div>
-    </fieldset>
+<div class="container">
+    <header>
+        <h1>Job Application Portal</h1>
+        <p class="subtitle">Proof of Concept: Transparency vs. Performance</p>
+    </header>
 
-    <hr>
+    <!-- [KRYSTAL] Mode Selection UI -->
+    <div class="mode-selector">
+        <div class="mode-option active" onclick="setMode('blackbox')" id="mode-blackbox">
+            Black Box Mode
+        </div>
+        <div class="mode-option" onclick="setMode('transparent')" id="mode-transparent">
+            Transparent Mode
+        </div>
+    </div>
 
     <!-- Application Form -->
     <form id="application-form">
-        <div>
-            <label for="gpa">GPA (0.0 - 4.0):</label>
-            <input type="number" id="gpa" name="gpa" step="0.1" min="0" max="4" required>
+        <div class="form-group">
+            <label for="gpa">GPA (0.0 - 4.0)</label>
+            <input type="number" id="gpa" name="gpa" step="0.1" min="0" max="4" required placeholder="e.g. 3.5">
         </div>
-        <br>
-        <div>
-            <label for="experience">Years of Experience:</label>
-            <input type="number" id="experience" name="experience" min="0" required>
+        <div class="form-group">
+            <label for="experience">Years of Experience</label>
+            <input type="number" id="experience" name="experience" min="0" required placeholder="e.g. 2">
         </div>
-        <br>
         <button type="submit" id="submit-btn">Apply Now</button>
     </form>
 
-    <hr>
-
     <!-- Result Display -->
-    <div id="result-area" style="display:none;">
-        <h3 id="result-title"></h3>
-        <p id="result-message"></p>
-        <ul id="explanation-list"></ul>
+    <div id="result-area">
+        <span class="placeholder">Result will appear here</span>
     </div>
+</div>
 
-    <script>
-        // Configuration
-        const CONFIG = {
-            thresholds: {
-                gpa: 3.0,
-                experience: 3
-            },
-            delays: {
-                transparent: 1000 // 1 second delay to simulate processing
-            }
-        };
+<script>
+    // Configuration
+    const CONFIG = {
+        thresholds: {
+            gpa: 3.0,
+            experience: 3
+        },
+        delays: {
+            transparent: 1000 // 1 second delay to simulate processing
+        }
+    };
 
-        // DOM Elements
-        const form = document.getElementById('application-form');
-        const resultArea = document.getElementById('result-area');
-        const resultTitle = document.getElementById('result-title');
-        const resultMessage = document.getElementById('result-message');
-        const explanationList = document.getElementById('explanation-list');
+    let currentMode = 'blackbox'; // Default mode
 
-        function init() {
-            form.addEventListener('submit', handleSubmission);
+    // DOM Elements
+    const form = document.getElementById('application-form');
+    const resultArea = document.getElementById('result-area');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function init() {
+        form.addEventListener('submit', handleSubmission);
+    }
+
+    // [JHON] Visual Mode Switching
+    window.setMode = function(mode) {
+        currentMode = mode;
+        document.getElementById('mode-blackbox').classList.toggle('active', mode === 'blackbox');
+        document.getElementById('mode-transparent').classList.toggle('active', mode === 'transparent');
+        
+        // Clear previous results visually
+        resultArea.classList.remove('visible');
+        setTimeout(() => {
+            resultArea.innerHTML = '<span class="placeholder">Result will appear here</span>';
+            resultArea.style.opacity = '1'; // Ensure it's not hidden
+        }, 300);
+    }
+
+    function handleSubmission(event) {
+        event.preventDefault();
+
+        const gpa = parseFloat(document.getElementById('gpa').value);
+        const experience = parseInt(document.getElementById('experience').value);
+        
+        // [JOSEPH] Input Validation Logic
+        if (isNaN(gpa) || isNaN(experience)) {
+            alert("Please enter valid numbers for GPA and Experience.");
+            return;
         }
 
-        function handleSubmission(event) {
-            event.preventDefault();
-            
-            // Get selected mode
-            const mode = document.querySelector('input[name="mode"]:checked').value;
-            const submitBtn = document.getElementById('submit-btn');
-            
-            // TODO: [JOSEPH] Add input validation here (ensure GPA is 0-4, etc.)
-            const gpa = parseFloat(document.getElementById('gpa').value);
-            const experience = parseInt(document.getElementById('experience').value);
-            
-            if (isNaN(gpa) || isNaN(experience)) {
-                alert("Please enter valid numbers for GPA and Experience.");
-                return;
-            }
+        if (gpa < 0.0 || gpa > 4.0) {
+            alert("GPA must be between 0.0 and 4.0.");
+            return;
+        }
 
-            // Disable button during processing
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Processing...";
-            
-            // Reset Display
-            resultArea.style.display = 'none';
-            explanationList.innerHTML = '';
+        // Disable button during processing
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Processing...";
+        
+        // Clear Result Area with Spinner
+        resultArea.innerHTML = '<div class="spinner"></div>';
+        resultArea.classList.add('visible');
 
-            if (mode === 'transparent') {
-                // transparent mode delay
-                setTimeout(() => {
-                    processApplication(gpa, experience, mode);
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = "Apply Now";
-                }, CONFIG.delays.transparent);
-            } else {
-                // Black Box Mode: Immediate
-                processApplication(gpa, experience, mode);
+        if (currentMode === 'transparent') {
+            // [KRYSTAL] Transparent mode delay
+            setTimeout(() => {
+                processApplication(gpa, experience);
                 submitBtn.disabled = false;
                 submitBtn.textContent = "Apply Now";
-            }
+            }, CONFIG.delays.transparent);
+        } else {
+            // Black Box Mode: Immediate
+            processApplication(gpa, experience);
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Apply Now";
         }
+    }
 
-        function processApplication(gpa, experience, mode) {
-            const result = evaluateCandidate(gpa, experience);
-            displayResult(result, mode, gpa, experience);
+    function processApplication(gpa, experience) {
+        const result = evaluateCandidate(gpa, experience);
+        displayResult(result, currentMode, gpa, experience);
+    }
+
+    function evaluateCandidate(gpa, experience) {
+        // Basic Scoring Logic
+        const passedGpa = gpa >= CONFIG.thresholds.gpa;
+        const passedExp = experience >= CONFIG.thresholds.experience;
+        const accepted = passedGpa && passedExp;
+        
+        // Dummy score calculation
+        const score = (gpa / 4.0 * 0.5) + (Math.min(experience, 10) / 10 * 0.5);
+
+        return { accepted, score: score.toFixed(2), passedGpa, passedExp };
+    }
+
+    // [JOSEPH] Helper function to generate explanation text
+    function generateExplanations(gpa, experience) {
+        const reasons = [];
+        if (gpa < CONFIG.thresholds.gpa) {
+            reasons.push(`GPA ${gpa} is below the required ${CONFIG.thresholds.gpa}.`);
         }
-
-        function evaluateCandidate(gpa, experience) {
-            // Basic Scoring Logic
-            const passedGpa = gpa >= CONFIG.thresholds.gpa;
-            const passedExp = experience >= CONFIG.thresholds.experience;
-            const accepted = passedGpa && passedExp;
-            
-            // Dummy score calculation
-            const score = (gpa / 4.0 * 0.5) + (Math.min(experience, 10) / 10 * 0.5);
-
-            return { accepted, score: score.toFixed(2), passedGpa, passedExp };
+        if (experience < CONFIG.thresholds.experience) {
+            reasons.push(`Experience ${experience} years is below the required ${CONFIG.thresholds.experience} years.`);
         }
+        return reasons;
+    }
 
-        function displayResult(result, mode, gpa, experience) {
-            resultArea.style.display = 'block';
-            
-            if (result.accepted) {
-                resultTitle.textContent = "ACCEPTED";
-                resultMessage.textContent = "Congratulations! You meet all our criteria.";
-            } else {
-                resultTitle.textContent = "REJECTED";
+    function displayResult(result, mode, gpa, experience) {
+        let htmlContent = "";
+
+        if (result.accepted) {
+            htmlContent = `<div><div class="status-accepted">ACCEPTED</div><div class="explanation">Congratulations! You meet all our criteria. Score: ${result.score}</div></div>`;
+        } else {
+            // Rejected
+            if (mode === 'transparent') {
+                // [JOSEPH] Logic: Show specific reasons in transparent mode
+                const reasons = generateExplanations(gpa, experience);
                 
-                if (mode === 'transparent') {
-                    resultMessage.textContent = `Application rejected. Score: ${result.score}.`;
-                    
-                    // Transparent Mode: Show specific reasons
-                    // TODO: [JOSEPH] This should eventually be replaced by the helper function
-                    const reasons = [];
-                    if (!result.passedGpa) {
-                        reasons.push(`GPA ${gpa} is below the required ${CONFIG.thresholds.gpa}.`);
-                    }
-                    if (!result.passedExp) {
-                        reasons.push(`Experience ${experience} years is below the required ${CONFIG.thresholds.experience} years.`);
-                    }
+                let listHtml = '<ul class="explanation-list">';
+                reasons.forEach(r => {
+                    listHtml += `<li>${r}</li>`;
+                });
+                listHtml += '</ul>';
 
-                    reasons.forEach(reason => {
-                        const li = document.createElement('li');
-                        li.textContent = reason;
-                        explanationList.appendChild(li);
-                    });
-                } else {
-                    // Black Box Mode: Show generic message
-                    resultMessage.textContent = `Score: ${result.score}. We have decided not to proceed with your application.`;
-                }
+                htmlContent = `<div>
+                    <div class="status-rejected">REJECTED</div>
+                    <div class="explanation">Score: ${result.score}</div>
+                    ${listHtml}
+                </div>`;
+            } else {
+                // Black Box Mode: Generic
+                htmlContent = `<div><div class="status-rejected">REJECTED</div><div class="explanation">Score: ${result.score}. We have decided not to proceed.</div></div>`;
             }
         }
 
-        init();
-    </script>
+        resultArea.innerHTML = htmlContent;
+        resultArea.classList.add('visible');
+    }
+
+    init();
+</script>
 </body>
 </html>
