@@ -59,14 +59,33 @@
 
         function handleSubmission(event) {
             event.preventDefault();
-            
             // TODO: [JOSEPH] Add input validation here (ensure GPA is 0-4, etc.)
-
+            const resultArea = document.getElementById('result-area');
+            const submitBtn = document.getElementById('submit-btn');
             const gpa = parseFloat(document.getElementById('gpa').value);
             const experience = parseInt(document.getElementById('experience').value);
             
-            // Javier's Task: Hardcoded to Black Box Mode for now
-            processApplication(gpa, experience);
+            if (isNaN(gpa) || isNaN(experience)) {
+                alert("Please enter valid numbers for GPA and Experience.");
+                return;
+            }
+            // Disable button during processing
+            submitBtn.disabled = true;
+            
+            if (currentMode === 'transparent') {
+                // Show loading spinner for Transparent Mode
+                resultArea.innerHTML = '<div class="spinner"></div>';
+                resultArea.classList.add('visible');
+
+                setTimeout(() => {
+                    processApplication(gpa, experience);
+                    submitBtn.disabled = false;
+                }, 2000); // 2-second artificial delay
+            } else {
+                // Javier's Task: Hardcoded to Black Box Mode for now
+                processApplication(gpa, experience);
+                submitBtn.disabled = false;
+            }
         }
 
         function processApplication(gpa, experience) {
