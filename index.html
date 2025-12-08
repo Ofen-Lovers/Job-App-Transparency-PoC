@@ -228,6 +228,9 @@
         <h1>Job Application Portal</h1>
         <p class="subtitle">Proof of Concept: Transparency vs. Performance</p>
     </header>
+    
+    <!-- [JAVIER] Core Application Structure -->
+
 
     <!-- [KRYSTAL] Mode Selection UI -->
     <div class="mode-selector">
@@ -259,6 +262,7 @@
 </div>
 
 <script>
+    // [JAVIER] Logic Skeleton & Configuration
     // Configuration
     const CONFIG = {
         thresholds: {
@@ -341,6 +345,7 @@
     }
 
     function evaluateCandidate(gpa, experience) {
+        // [JAVIER] Core Black Box Scoring Logic
         // Basic Scoring Logic
         const passedGpa = gpa >= CONFIG.thresholds.gpa;
         const passedExp = experience >= CONFIG.thresholds.experience;
@@ -387,6 +392,7 @@
                     ${listHtml}
                 </div>`;
             } else {
+                // [JAVIER] Black Box Mode: Generic Rejection
                 // Black Box Mode: Generic
                 htmlContent = `<div><div class="status-rejected">REJECTED</div><div class="explanation">Score: ${result.score}. We have decided not to proceed.</div></div>`;
             }
