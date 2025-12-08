@@ -10,7 +10,18 @@
 
     <h1>Job Application Portal</h1>
     
-    <!-- TODO: [KRYSTAL] Mode Selection po nimo idol (Black Box vs Transparent)-->
+    <!-- Mode Selection -->
+    <fieldset id="mode-selection">
+        <legend>Select System Mode:</legend>
+        <div>
+            <input type="radio" id="mode-blackbox" name="mode" value="blackbox" checked>
+            <label for="mode-blackbox">Black Box Mode (Fast, Opaque)</label>
+        </div>
+        <div>
+            <input type="radio" id="mode-transparent" name="mode" value="transparent">
+            <label for="mode-transparent">Transparent Mode (Slower, Explains Decisions)</label>
+        </div>
+    </fieldset>
 
     <hr>
 
@@ -26,7 +37,7 @@
             <input type="number" id="experience" name="experience" min="0" required>
         </div>
         <br>
-        <button type="submit">Apply Now</button>
+        <button type="submit" id="submit-btn">Apply Now</button>
     </form>
 
     <hr>
@@ -35,6 +46,7 @@
     <div id="result-area" style="display:none;">
         <h3 id="result-title"></h3>
         <p id="result-message"></p>
+        <ul id="explanation-list"></ul>
     </div>
 
     <script>
@@ -43,8 +55,10 @@
             thresholds: {
                 gpa: 3.0,
                 experience: 3
+            },
+            delays: {
+                transparent: 1000 // 1 second delay to simulate processing
             }
-            // TODO: [KRYSTAL] Add delays configuration here
         };
 
         // DOM Elements
@@ -52,6 +66,7 @@
         const resultArea = document.getElementById('result-area');
         const resultTitle = document.getElementById('result-title');
         const resultMessage = document.getElementById('result-message');
+        const explanationList = document.getElementById('explanation-list');
 
         function init() {
             form.addEventListener('submit', handleSubmission);
@@ -59,9 +74,12 @@
 
         function handleSubmission(event) {
             event.preventDefault();
-            // TODO: [JOSEPH] Add input validation here (ensure GPA is 0-4, etc.)
-            const resultArea = document.getElementById('result-area');
+            
+            // Get selected mode
+            const mode = document.querySelector('input[name="mode"]:checked').value;
             const submitBtn = document.getElementById('submit-btn');
+            
+            // TODO: [JOSEPH] Add input validation here (ensure GPA is 0-4, etc.)
             const gpa = parseFloat(document.getElementById('gpa').value);
             const experience = parseInt(document.getElementById('experience').value);
             
@@ -69,30 +87,33 @@
                 alert("Please enter valid numbers for GPA and Experience.");
                 return;
             }
+
             // Disable button during processing
             submitBtn.disabled = true;
+            submitBtn.textContent = "Processing...";
             
-            if (currentMode === 'transparent') {
-                // Show loading spinner for Transparent Mode
-                resultArea.innerHTML = '<div class="spinner"></div>';
-                resultArea.classList.add('visible');
+            // Reset Display
+            resultArea.style.display = 'none';
+            explanationList.innerHTML = '';
 
+            if (mode === 'transparent') {
+                // transparent mode delay
                 setTimeout(() => {
-                    processApplication(gpa, experience);
+                    processApplication(gpa, experience, mode);
                     submitBtn.disabled = false;
-                }, 2000); // 2-second artificial delay
+                    submitBtn.textContent = "Apply Now";
+                }, CONFIG.delays.transparent);
             } else {
-                // Javier's Task: Hardcoded to Black Box Mode for now
-                processApplication(gpa, experience);
+                // Black Box Mode: Immediate
+                processApplication(gpa, experience, mode);
                 submitBtn.disabled = false;
+                submitBtn.textContent = "Apply Now";
             }
         }
 
-        function processApplication(gpa, experience) {
-            // TODO: [KRYSTAL] Implement delay logic for Transparent Mode here
-
+        function processApplication(gpa, experience, mode) {
             const result = evaluateCandidate(gpa, experience);
-            displayResult(result);
+            displayResult(result, mode, gpa, experience);
         }
 
         function evaluateCandidate(gpa, experience) {
@@ -104,13 +125,10 @@
             // Dummy score calculation
             const score = (gpa / 4.0 * 0.5) + (Math.min(experience, 10) / 10 * 0.5);
 
-            // TODO: [JOSEPH] Create helper function to generate explanation text
-            // const reasons = generateExplanations(gpa, experience);
-
-            return { accepted, score: score.toFixed(2) };
+            return { accepted, score: score.toFixed(2), passedGpa, passedExp };
         }
 
-        function displayResult(result) {
+        function displayResult(result, mode, gpa, experience) {
             resultArea.style.display = 'block';
             
             if (result.accepted) {
@@ -118,10 +136,29 @@
                 resultMessage.textContent = "Congratulations! You meet all our criteria.";
             } else {
                 resultTitle.textContent = "REJECTED";
-                // Black Box Mode: Show generic message and score
-                resultMessage.textContent = `Score: ${result.score}. We have decided not to proceed with your application.`;
                 
-                // TODO: [KRYSTAL] Add logic to display specific reasons in Transparent Mode
+                if (mode === 'transparent') {
+                    resultMessage.textContent = `Application rejected. Score: ${result.score}.`;
+                    
+                    // Transparent Mode: Show specific reasons
+                    // TODO: [JOSEPH] This should eventually be replaced by the helper function
+                    const reasons = [];
+                    if (!result.passedGpa) {
+                        reasons.push(`GPA ${gpa} is below the required ${CONFIG.thresholds.gpa}.`);
+                    }
+                    if (!result.passedExp) {
+                        reasons.push(`Experience ${experience} years is below the required ${CONFIG.thresholds.experience} years.`);
+                    }
+
+                    reasons.forEach(reason => {
+                        const li = document.createElement('li');
+                        li.textContent = reason;
+                        explanationList.appendChild(li);
+                    });
+                } else {
+                    // Black Box Mode: Show generic message
+                    resultMessage.textContent = `Score: ${result.score}. We have decided not to proceed with your application.`;
+                }
             }
         }
 
